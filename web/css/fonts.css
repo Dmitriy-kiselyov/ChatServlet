@@ -1,0 +1,13 @@
+@font-face {
+    font-family: Bitter;
+    src: local('BitterBold'), /*вдруг шрифт уже есть на машине клиента, а если нет то будем грузить с сервера:*/
+    url('/fonts/BitterBold.eot'), /*для IE без указания формата - будет использовать oet*/
+    url('/fonts/BitterBold.ttf') format("truetype"); /* для остальных браузеров*/
+}
+
+@font-face {
+    font-family: 'Open Sans';
+    src: local('OpenSans'), /*вдруг шрифт уже есть на машине клиента, а если нет то будем грузить с сервера:*/
+    url('/fonts/OpenSans.eot'), /*для IE без указания формата - будет использовать oet*/
+    url('/fonts/OpenSans.ttf') format("truetype"); /* для остальных браузеров*/
+}

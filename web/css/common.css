@@ -1,0 +1,46 @@
+.no-select {
+    user-select: none;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -o-user-select: none;
+}
+
+html {
+    height: 100%;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background: url(../img/ocean.jpg);
+    background-size: cover;
+}
+
+.content {
+    background-color: #eff2ff;
+    color: #444;
+    box-shadow: 0 0 20px 0 dimgray;
+    font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+button::-moz-focus-inner {
+    border: 0;
+}
+
+input[type=submit]::-moz-focus-inner {
+    border: 0;
+}
+
+input[type=button]::-moz-focus-inner {
+    border: 0;
+}
+
+/*background-color: #3a2963; dark*/
+/*color: #933EC5; purple*/
+/*background: #c4a2ff; light purple*/
