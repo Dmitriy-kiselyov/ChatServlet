@@ -18,7 +18,7 @@ body {
     margin: 0;
     padding: 0;
     height: 100%;
-    background: url(../img/ocean.jpg);
+    background: url(../img/ocean_compressed.jpg);
     background-size: cover;
 }
 
