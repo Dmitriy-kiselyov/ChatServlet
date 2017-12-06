@@ -8,7 +8,7 @@ public interface ChatConstants {
     String API_ACTION = "action";
     String API_REGISTER = "register";
     String API_MESSAGES = "getMessages";
-    String API_POST_MESSAGE = "postMessage";
+    String API_POST_MESSAGE = "sendMessage";
 
     int ERR_UNKNOWN_PARAM = 1;
     int ERR_LOGIN_FAIL = 2;

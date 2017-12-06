@@ -41,14 +41,16 @@ function getMessages() {
     });
 }
 
-function postMessage() {
+function sendMessage() {
     var input = $("#send_input");
     var message = input.val().trim();
     if (message.length == 0)
         return;
 
+    console.log("Send message", message);
+
     $.ajax({
-        url: "ChatServlet?action=postMessage",
+        url: "ChatServlet?action=sendMessage",
         method: "POST",
         data: {
             message: message
@@ -95,8 +97,8 @@ $(function () {
 
     getMessages();
 
-    $("#send_form").off("submit").on("submit", function () {
-        postMessage();
+    $("#send_form").on("submit", function () {
+        sendMessage();
         return false;
     });
 });

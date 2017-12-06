@@ -66,6 +66,7 @@
 .chat__message__time {
     margin-left: 5px;
     color: gray;
+    font-size: smaller;
 }
 
 .chat__message__text {
