@@ -6,26 +6,41 @@ import java.util.ArrayList;
 
 public class ChatApp {
 
-    private ArrayList<Message> messages;
-
     public ChatApp() {
-        messages = new ArrayList<>();
+        Database.init();
+        Database.preset();
     }
 
     public void addMessage(Message message) {
-        messages.add(message);
+        Database.addMessage(message);
     }
 
     public ArrayList<Message> getMessages() {
-        return messages;
+        return Database.getMessages();
     }
 
     public JSONArray getJSONMessages() {
         JSONArray arr = new JSONArray();
-        for (Message m : messages)
+        for (Message m : Database.getMessages())
             arr.put(m.toJSON());
 
         return arr;
+    }
+
+    public User getUser(String login) {
+        return Database.getUser(login);
+    }
+
+    public boolean registerUser(User user) throws DatabaseException {
+        User userFound = Database.getUser(user.getLogin());
+        if (userFound == null) {
+            Database.addUser(user);
+            return true;
+        } else if (!userFound.getPassword().equals(user.getPassword())) {
+            throw new DatabaseException("Пользователь с таким именем уже существует / неверный пароль");
+        }
+
+        return false;
     }
 
 }

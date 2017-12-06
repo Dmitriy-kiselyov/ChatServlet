@@ -3,7 +3,6 @@ package ru.tanya_dima.chat;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.omg.CORBA.Request;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -24,6 +23,14 @@ public class ChatServlet extends HttpServlet implements ChatConstants {
             return;
         }
 
+        if (!checkAuthentication(req, resp))
+            return;
+
+        if (action.equals(API_POST_MESSAGE)) {
+            postMessage(req, resp);
+            return;
+        }
+
         sendError(resp, ERR_UNKNOWN_PARAM, "Неизвестный запрос");
     }
 
@@ -36,8 +43,10 @@ public class ChatServlet extends HttpServlet implements ChatConstants {
         if (!checkAuthentication(req, resp))
             return;
 
-        if (action.equals(API_MESSAGES))
+        if (action.equals(API_MESSAGES)) {
             getMessages(req, resp);
+            return;
+        }
 
         sendError(resp, ERR_UNKNOWN_PARAM, "Неизвестный запрос");
     }
@@ -67,7 +76,24 @@ public class ChatServlet extends HttpServlet implements ChatConstants {
         }
     }
 
+    private void postMessage(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        ChatApp app = (ChatApp) getServletContext().getAttribute(APP);
+        HttpSession sess = req.getSession();
+
+        User sender = app.getUser((String) sess.getAttribute(LOGIN));
+        String text = req.getParameter("message");
+        app.addMessage(new Message(sender, text));
+
+        try {
+            sendResponse(resp, text);
+        }
+        catch (JSONException e) {
+            sendUnknownError(resp);
+        }
+    }
+
     private void register(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        ChatApp app = (ChatApp) getServletContext().getAttribute(APP);
         HttpSession session = req.getSession();
 
         String login = req.getParameter("login");
@@ -80,7 +106,7 @@ public class ChatServlet extends HttpServlet implements ChatConstants {
 
         JSONObject json = new JSONObject();
         try {
-            RegisterDatabase.register(user);
+            app.registerUser(user);
             session.setAttribute(LOGIN, user.getLogin());
             json.put("url", "chat.jsp");
             sendResponse(resp, json);
@@ -110,7 +136,7 @@ public class ChatServlet extends HttpServlet implements ChatConstants {
 
     private void sendUnknownError(HttpServletResponse resp) throws IOException {
         //Never happens
-        resp.getWriter().write("{\"error\": {\"error_code\": 100}}");
+        resp.getWriter().write("{\"error\": {\"error_code\": " + ERR_DEFAULT + "}}");
     }
 
     private void sendResponse(HttpServletResponse resp, JSONObject json) throws JSONException, IOException {
@@ -119,10 +145,15 @@ public class ChatServlet extends HttpServlet implements ChatConstants {
         resp.getWriter().write(wrapper.toString());
     }
 
-    private void sendResponse(HttpServletResponse resp, JSONArray
-            json) throws JSONException, IOException {
+    private void sendResponse(HttpServletResponse resp, JSONArray json) throws JSONException, IOException {
         JSONObject wrapper = new JSONObject();
         wrapper.put("response", json);
+        resp.getWriter().write(wrapper.toString());
+    }
+
+    private void sendResponse(HttpServletResponse resp, String str) throws JSONException, IOException {
+        JSONObject wrapper = new JSONObject();
+        wrapper.put("response", str);
         resp.getWriter().write(wrapper.toString());
     }
 

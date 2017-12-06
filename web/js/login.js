@@ -64,8 +64,8 @@ function submitForm() {
     var passOk = validatePassword();
     if (passOk && loginOk) {
         $.ajax({
-            url: form.attr("action"),
-            type: form.attr("method"),
+            url: "ChatServlet?action=register",
+            type: "POST",
             data: form.serialize(),
             success: function (data) {
                 if (data.response)
@@ -75,7 +75,6 @@ function submitForm() {
             }
         });
     }
-    return false; //do not send post request directly
 }
 
 function showMessage(el, message) {
@@ -97,6 +96,9 @@ $(function () {
     loginField.on("blur", validateLogin);
     passwordField.on("blur", validatePassword);
 
-    //submit
-    $("#register").on("submit", submitForm);
+    //Отправка формы
+    $("#register").off("submit").on("submit", function () {
+        submitForm();
+        return false;
+    });
 });

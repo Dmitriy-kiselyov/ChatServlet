@@ -9,13 +9,13 @@
     </listener>
 
     <servlet>
-        <servlet-name>RegisterServlet</servlet-name>
+        <servlet-name>ChatServlet</servlet-name>
         <servlet-class>ru.tanya_dima.chat.ChatServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
-        <servlet-name>RegisterServlet</servlet-name>
-        <url-pattern>/RegisterServlet</url-pattern>
+        <servlet-name>ChatServlet</servlet-name>
+        <url-pattern>/ChatServlet</url-pattern>
     </servlet-mapping>
 
     <jsp-config>

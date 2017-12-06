@@ -21,7 +21,7 @@
 
 <body>
 
-<form id="register" method="post" action="RegisterServlet?action=register" autocomplete="off" class="content login">
+<form id="register" autocomplete="off" class="content login">
     <div class="login__title">Вход</div>
 
     <input type="text" name="login" placeholder="Логин" class="login__field">
