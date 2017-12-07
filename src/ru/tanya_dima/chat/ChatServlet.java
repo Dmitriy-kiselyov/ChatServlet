@@ -86,6 +86,7 @@ public class ChatServlet extends HttpServlet implements ChatConstants {
 
     private void cometMessage(HttpServletRequest req, HttpServletResponse resp) {
         AsyncContext context = req.startAsync(req, resp);
+        context.setTimeout(0);
         ServletContext servletContext = req.getServletContext();
         Queue<AsyncContext> users = (Queue<AsyncContext>) servletContext.getAttribute(COMET_USERS);
         users.add(context);

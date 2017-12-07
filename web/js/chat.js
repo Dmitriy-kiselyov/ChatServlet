@@ -51,6 +51,9 @@ function cometMessage() {
         success: function (data) {
             fetchMessages([data.response]);
             cometMessage();
+        },
+        error: function () {
+            setTimeout(cometMessage, 5000);
         }
     });
 }
