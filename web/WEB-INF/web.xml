@@ -5,12 +5,13 @@
          version="3.1">
 
     <listener>
-        <listener-class>ru.tanya_dima.chat.ChatListener</listener-class>
+        <listener-class>ru.tanya_dima.chat.ChatService</listener-class>
     </listener>
 
     <servlet>
         <servlet-name>ChatServlet</servlet-name>
         <servlet-class>ru.tanya_dima.chat.ChatServlet</servlet-class>
+        <async-supported>true</async-supported>
     </servlet>
 
     <servlet-mapping>

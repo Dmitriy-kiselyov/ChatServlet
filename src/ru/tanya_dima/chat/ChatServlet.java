@@ -4,12 +4,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import javax.servlet.AsyncContext;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.Queue;
 
 public class ChatServlet extends HttpServlet implements ChatConstants {
 
@@ -48,6 +51,11 @@ public class ChatServlet extends HttpServlet implements ChatConstants {
             return;
         }
 
+        if (action.equals(API_MESSAGE_COMET)) {
+            cometMessage(req, resp);
+            return;
+        }
+
         sendError(resp, ERR_UNKNOWN_PARAM, "Неизвестный запрос");
     }
 
@@ -76,20 +84,37 @@ public class ChatServlet extends HttpServlet implements ChatConstants {
         }
     }
 
+    private void cometMessage(HttpServletRequest req, HttpServletResponse resp) {
+        AsyncContext context = req.startAsync(req, resp);
+        ServletContext servletContext = req.getServletContext();
+        Queue<AsyncContext> users = (Queue<AsyncContext>) servletContext.getAttribute(COMET_USERS);
+        users.add(context);
+    }
+
     private void postMessage(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         ChatApp app = (ChatApp) getServletContext().getAttribute(APP);
         HttpSession sess = req.getSession();
 
         User sender = app.getUser((String) sess.getAttribute(LOGIN));
         String text = req.getParameter("message");
-        app.addMessage(new Message(sender, text));
+        Message message = new Message(sender, text);
+        app.addMessage(message);
+        broadcastMessage(req, resp, message);
 
         try {
-            sendResponse(resp, text);
+            sendResponse(resp, message.toJSON());
         }
         catch (JSONException e) {
             sendUnknownError(resp);
         }
+    }
+
+    private void broadcastMessage(HttpServletRequest req, HttpServletResponse resp, Message message) throws IOException {
+        AsyncContext context = req.startAsync(req, resp);
+        ServletContext servletContext = req.getServletContext();
+        Queue<Message> messages = (Queue<Message>) servletContext.getAttribute(COMET_MESSAGES);
+        messages.add(message);
+        context.complete();
     }
 
     private void register(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -148,12 +173,6 @@ public class ChatServlet extends HttpServlet implements ChatConstants {
     private void sendResponse(HttpServletResponse resp, JSONArray json) throws JSONException, IOException {
         JSONObject wrapper = new JSONObject();
         wrapper.put("response", json);
-        resp.getWriter().write(wrapper.toString());
-    }
-
-    private void sendResponse(HttpServletResponse resp, String str) throws JSONException, IOException {
-        JSONObject wrapper = new JSONObject();
-        wrapper.put("response", str);
         resp.getWriter().write(wrapper.toString());
     }
 

@@ -28,7 +28,7 @@ function fetchMessages(messages) {
         chat.append(wrapper);
     });
 
-    chat.scrollTop(chat.height());
+    chat.parent().scrollTop(chat.height());
 }
 
 function getMessages() {
@@ -37,6 +37,20 @@ function getMessages() {
         type: "GET",
         success: function (data) {
             fetchMessages(data.response);
+        },
+        complete: function () {
+            cometMessage();
+        }
+    });
+}
+
+function cometMessage() {
+    $.ajax({
+        url: "ChatServlet?action=cometMessage",
+        type: "GET",
+        success: function (data) {
+            fetchMessages([data.response]);
+            cometMessage();
         }
     });
 }
@@ -47,16 +61,20 @@ function sendMessage() {
     if (message.length == 0)
         return;
 
-    console.log("Send message", message);
-
     $.ajax({
         url: "ChatServlet?action=sendMessage",
         method: "POST",
         data: {
             message: message
         },
+        beforeSend: function () {
+            input.val("").focus();
+        },
         success: function (data) {
             console.log(data);
+        },
+        error: function () {
+            console.log("POST ERROR");
         }
     });
 }
@@ -95,7 +113,10 @@ function parseTime(millis) {
 $(function () {
     placeholderAutoHide($("#send_input"));
 
-    getMessages();
+    setTimeout(function () {
+        getMessages();
+    }, 10);
+
 
     $("#send_form").on("submit", function () {
         sendMessage();

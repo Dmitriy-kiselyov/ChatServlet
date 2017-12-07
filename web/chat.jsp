@@ -23,7 +23,10 @@
 
 <div class="content chat">
     <div class="chat__header">Чатик :*</div>
-    <div class="chat__main" id="chat"></div>
+    <div class="chat__main_wrapper">
+        <div class="chat__main" id="chat">
+        </div>
+    </div>
     <form class="chat__footer" autocomplete="off" id="send_form">
         <div class="chat__message_wrapper">
             <input type="text" name="message" class="chat__input" placeholder="Сообщение..." id="send_input">
