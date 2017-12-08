@@ -98,6 +98,11 @@ public class ChatServlet extends HttpServlet implements ChatConstants {
 
         User sender = app.getUser((String) sess.getAttribute(LOGIN));
         String text = req.getParameter("message");
+        if (text == null) {
+            sendError(resp, ERR_NO_PARAMS, "Нет необходимых параметров");
+            return;
+        }
+
         Message message = new Message(sender, text);
         app.addMessage(message);
         broadcastMessage(req, resp, message);
