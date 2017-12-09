@@ -9,6 +9,7 @@ public interface ChatConstants {
 
     String API_ACTION = "action";
     String API_REGISTER = "register";
+    String API_LOGOUT = "logout";
     String API_MESSAGES = "getMessages";
     String API_POST_MESSAGE = "sendMessage";
     String API_MESSAGE_COMET = "cometMessage";

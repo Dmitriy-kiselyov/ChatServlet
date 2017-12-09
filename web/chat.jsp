@@ -14,6 +14,10 @@
 </head>
 
 <%
+    response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
+    response.setHeader("Pragma", "no-cache");
+    response.setDateHeader("Expires", 0);
+
     if (session.getAttribute(ChatConstants.LOGIN) == null) {
         response.sendRedirect(request.getContextPath() + "/login.jsp");
     }
@@ -22,7 +26,11 @@
 <body>
 
 <div class="content chat">
-    <div class="chat__header">Чатик :*</div>
+    <div class="chat__header">
+        <div class="chat__header__icon"></div>
+        <span class="chat__header__name">Чатик :*</span>
+        <a href="ChatServlet?action=logout" class="chat__header__icon chat__header__logout"></a>
+    </div>
     <div class="chat__main_wrapper">
         <div class="chat__main" id="chat">
         </div>

@@ -17,13 +17,36 @@
     flex-grow: 0;
     flex-shrink: 0;
 
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
     padding: 5px;
     background-color: #3a2963;
-    color: whitesmoke;
+    text-align: center;
+}
 
+.chat__header__name {
+    color: whitesmoke;
     font-family: Bitter;
     font-size: xx-large;
-    text-align: center;
+}
+
+.chat__header__icon {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+}
+
+.chat__header__logout {
+    background: url(../img/logout.svg) no-repeat center;
+    background-size: contain;
+    cursor: pointer;
+}
+
+.chat__header__logout:hover {
+    background-image: url(../img/logout-hover.svg);
 }
 
 .chat__main_wrapper {

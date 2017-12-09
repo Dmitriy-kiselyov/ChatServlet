@@ -5,6 +5,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import javax.servlet.AsyncContext;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -40,8 +41,13 @@ public class ChatServlet extends HttpServlet implements ChatConstants {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         setContentType(resp);
-
+        
         String action = req.getParameter(API_ACTION);
+
+        if (action.equals(API_LOGOUT)) {
+            logout(req, resp);
+            return;
+        }
 
         if (!checkAuthentication(req, resp))
             return;
@@ -62,6 +68,13 @@ public class ChatServlet extends HttpServlet implements ChatConstants {
     private void setContentType(HttpServletResponse resp) {
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
+    }
+
+    private void logout(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        HttpSession session = req.getSession();
+        session.invalidate();
+
+        resp.sendRedirect(req.getContextPath() + "/login.jsp");
     }
 
     private boolean checkAuthentication(HttpServletRequest req, HttpServletResponse resp) throws IOException {
