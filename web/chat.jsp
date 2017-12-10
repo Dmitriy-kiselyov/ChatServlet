@@ -27,7 +27,7 @@
 
 <div class="content chat">
     <div class="chat__header">
-        <div class="chat__header__icon"></div>
+        <a class="chat__header__icon chat__header__sound"></a>
         <span class="chat__header__name">Чатик :*</span>
         <a href="ChatServlet?action=logout" class="chat__header__icon chat__header__logout"></a>
     </div>

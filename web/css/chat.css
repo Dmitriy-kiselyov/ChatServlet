@@ -37,16 +37,35 @@
     display: inline-block;
     width: 30px;
     height: 30px;
+
+    background: no-repeat center;
+    background-size: 90% 90%;
+    cursor: pointer;
 }
 
 .chat__header__logout {
-    background: url(../img/logout.svg) no-repeat center;
-    background-size: contain;
-    cursor: pointer;
+    background-image: url(../img/logout.svg);
+
 }
 
 .chat__header__logout:hover {
     background-image: url(../img/logout-hover.svg);
+}
+
+.chat__header__sound {
+    background-image: url(../img/sound.svg);
+}
+
+.chat__header__sound:hover {
+    background-image: url(../img/sound-hover.svg);
+}
+
+.chat__header__sound-mute {
+    background-image: url(../img/sound_mute.svg);
+}
+
+.chat__header__sound-mute:hover {
+    background-image: url(../img/sound_mute-hover.svg);
 }
 
 .chat__main_wrapper {

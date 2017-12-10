@@ -50,12 +50,22 @@ function cometMessage() {
         type: "GET",
         success: function (data) {
             fetchMessages([data.response]);
+            playMessage();
             cometMessage();
         },
         error: function () {
             setTimeout(cometMessage, 5000);
         }
     });
+}
+
+function playMessage() {
+    var soundEl = $(".chat__header__sound");
+    if (soundEl && !soundEl.hasClass("chat__header__sound-mute")) {
+        var audio = playMessage.audio || (playMessage.audio = new Audio("/sound/message.mp3"));
+        audio.currentTime = 0;
+        audio.play();
+    }
 }
 
 function sendMessage() {
@@ -120,6 +130,17 @@ $(function () {
         getMessages();
     }, 10);
 
+    var soundSwitch = $(".chat__header__sound");
+    if (localStorage.getItem("sound") == "off") {
+        soundSwitch.addClass("chat__header__sound-mute");
+    }
+    soundSwitch.click(function () {
+        soundSwitch.toggleClass("chat__header__sound-mute");
+        if (soundSwitch.hasClass("chat__header__sound-mute"))
+            localStorage.setItem("sound", "off");
+        else
+            localStorage.setItem("sound", "on");
+    });
 
     $("#send_form").on("submit", function () {
         sendMessage();
