@@ -11,17 +11,17 @@ public class ChatApp {
         Database.preset();
     }
 
-    public void addMessage(Message message) {
+    public void addMessage(UserMessage message) {
         Database.addMessage(message);
     }
 
-    public ArrayList<Message> getMessages() {
+    public ArrayList<UserMessage> getMessages() {
         return Database.getMessages();
     }
 
     public JSONArray getJSONMessages() {
         JSONArray arr = new JSONArray();
-        for (Message m : Database.getMessages())
+        for (UserMessage m : Database.getMessages())
             arr.put(m.toJSON());
 
         return arr;

@@ -5,7 +5,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import javax.servlet.AsyncContext;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -23,7 +22,7 @@ public class ChatServlet extends HttpServlet implements ChatConstants {
 
         String action = req.getParameter(API_ACTION);
         if (action.equals(API_REGISTER)) {
-            register(req, resp);
+            login(req, resp);
             return;
         }
 
@@ -41,7 +40,7 @@ public class ChatServlet extends HttpServlet implements ChatConstants {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         setContentType(resp);
-        
+
         String action = req.getParameter(API_ACTION);
 
         if (action.equals(API_LOGOUT)) {
@@ -58,7 +57,7 @@ public class ChatServlet extends HttpServlet implements ChatConstants {
         }
 
         if (action.equals(API_MESSAGE_COMET)) {
-            cometMessage(req, resp);
+            subscribeToMessages(req, resp);
             return;
         }
 
@@ -70,10 +69,46 @@ public class ChatServlet extends HttpServlet implements ChatConstants {
         resp.setCharacterEncoding("UTF-8");
     }
 
+    private void login(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        ChatApp app = (ChatApp) getServletContext().getAttribute(APP);
+        HttpSession session = req.getSession();
+
+        String login = req.getParameter("login");
+        String password = req.getParameter("password");
+        if (login == null || password == null) {
+            sendError(resp, ERR_NO_PARAMS, "Нет необходимых параметров");
+            return;
+        }
+        User user = new User(login, password);
+
+        JSONObject json = new JSONObject();
+        try {
+            app.registerUser(user);
+            session.setAttribute(LOGIN, user.getLogin());
+
+            SystemMessage message = new SystemMessage(user, SystemMessage.Status.ENTER);
+            broadcastMessage(req, resp, message);
+
+            json.put("url", "chat.jsp");
+            sendResponse(resp, json);
+        }
+        catch (DatabaseException e) {
+            sendError(resp, ERR_LOGIN_FAIL, e.getMessage());
+        }
+        catch (JSONException e) {
+            sendUnknownError(resp);
+        }
+    }
+
     private void logout(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         HttpSession session = req.getSession();
-        session.invalidate();
 
+        ChatApp app = (ChatApp) getServletContext().getAttribute(APP);
+        User user = app.getUser((String) session.getAttribute(LOGIN));
+        SystemMessage message = new SystemMessage(user, SystemMessage.Status.LEFT);
+        broadcastMessage(req, resp, message);
+
+        session.invalidate();
         resp.sendRedirect(req.getContextPath() + "/login.jsp");
     }
 
@@ -97,7 +132,7 @@ public class ChatServlet extends HttpServlet implements ChatConstants {
         }
     }
 
-    private void cometMessage(HttpServletRequest req, HttpServletResponse resp) {
+    private void subscribeToMessages(HttpServletRequest req, HttpServletResponse resp) {
         AsyncContext context = req.startAsync(req, resp);
         context.setTimeout(0);
         ServletContext servletContext = req.getServletContext();
@@ -116,7 +151,7 @@ public class ChatServlet extends HttpServlet implements ChatConstants {
             return;
         }
 
-        Message message = new Message(sender, text);
+        UserMessage message = new UserMessage(sender, text);
         app.addMessage(message);
         broadcastMessage(req, resp, message);
 
@@ -128,39 +163,12 @@ public class ChatServlet extends HttpServlet implements ChatConstants {
         }
     }
 
-    private void broadcastMessage(HttpServletRequest req, HttpServletResponse resp, Message message) throws IOException {
+    private void broadcastMessage(HttpServletRequest req, HttpServletResponse resp, Message message) {
         AsyncContext context = req.startAsync(req, resp);
         ServletContext servletContext = req.getServletContext();
         Queue<Message> messages = (Queue<Message>) servletContext.getAttribute(COMET_MESSAGES);
         messages.add(message);
         context.complete();
-    }
-
-    private void register(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        ChatApp app = (ChatApp) getServletContext().getAttribute(APP);
-        HttpSession session = req.getSession();
-
-        String login = req.getParameter("login");
-        String password = req.getParameter("password");
-        if (login == null || password == null) {
-            sendError(resp, ERR_NO_PARAMS, "Нет необходимых параметров");
-            return;
-        }
-        User user = new User(login, password);
-
-        JSONObject json = new JSONObject();
-        try {
-            app.registerUser(user);
-            session.setAttribute(LOGIN, user.getLogin());
-            json.put("url", "chat.jsp");
-            sendResponse(resp, json);
-        }
-        catch (DatabaseException e) {
-            sendError(resp, ERR_LOGIN_FAIL, e.getMessage());
-        }
-        catch (JSONException e) {
-            sendUnknownError(resp);
-        }
     }
 
     private void sendError(HttpServletResponse resp, int code, String message) throws IOException {

@@ -13,9 +13,11 @@ function placeholderAutoHide(element) {
     element.on("blur", show);
 }
 
-function fetchMessages(messages) {
-    var chat = $("#chat");
+function fetchUserMessages(messages) {
+    if (!Array.isArray(messages))
+        messages = [messages];
 
+    var chat = $("#chat");
     messages.forEach(function (message) {
         var header = $("<div>").addClass("chat__message__header")
             .append($("<span>").addClass("chat__message__name").text(message.user))
@@ -28,6 +30,27 @@ function fetchMessages(messages) {
         chat.append(wrapper);
     });
 
+    scrollChat();
+}
+
+function fetchSystemMessage(message) {
+    var chat = $("#chat");
+
+    var status = message.status == "enter" ? " зашел в беседу" : " вышел из беседы";
+    var text = $("<div>").addClass("chat__message__text-system")
+        .append($(document.createTextNode("Пользователь ")))
+        .append($("<span>").addClass("chat__message__name").text(message.user))
+        .append($(document.createTextNode(status)));
+
+    var wrapper = $("<div>").addClass("chat__message")
+        .append(text);
+    chat.append(wrapper);
+
+    scrollChat();
+}
+
+function scrollChat() {
+    var chat = $("#chat");
     chat.parent().scrollTop(chat.height());
 }
 
@@ -36,7 +59,7 @@ function getMessages() {
         url: "ChatServlet?action=getMessages",
         type: "GET",
         success: function (data) {
-            fetchMessages(data.response);
+            fetchUserMessages(data.response);
         },
         complete: function () {
             cometMessage();
@@ -49,12 +72,17 @@ function cometMessage() {
         url: "ChatServlet?action=cometMessage",
         type: "GET",
         success: function (data) {
-            fetchMessages([data.response]);
+            var message = data.response;
+            if (message.message)
+                fetchUserMessages(message);
+            else if (message.status)
+                fetchSystemMessage(message);
+
             playMessage();
             cometMessage();
         },
         error: function () {
-            setTimeout(cometMessage, 5000);
+            setTimeout(cometMessage, 2000);
         }
     });
 }
