@@ -23,5 +23,6 @@
     <orderEntry type="library" name="jQuery" level="project" />
     <orderEntry type="library" name="java-json" level="project" />
     <orderEntry type="library" name="jquery-DefinitelyTyped" level="application" />
+    <orderEntry type="library" name="lib (2)" level="project" />
   </component>
 </module>
